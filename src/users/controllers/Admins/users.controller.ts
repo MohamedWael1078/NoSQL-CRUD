@@ -1,14 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, ValidationPipe } from '@nestjs/common';
-import { UsersService } from '../services/users.service';
-import { CreateUserDto } from '../Dtos/createUser.dto';
-import { UpdateUserDto } from '../Dtos/updateUser.dto';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, ValidationPipe } from '@nestjs/common';
+import { UsersService } from '../../services/Admins/users.service';
+import { CreateUserDto } from '../../Dtos/Admins/createUser.dto';
+import { UpdateUserDto } from '../../Dtos/Admins/updateUser.dto';
+import { Roles } from '../../guards/roles.decorator';
+import { UsersGuard } from 'src/users/guards/users.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   // @Desc Get All Users
   // @Route Get /users
-  //@access Public 
+  //@access [Admin, manager] 
+  @Roles(['admin', 'manager'])
+  @UseGuards(UsersGuard)
   @Get()
   getAllUsers() {
     return this.usersService.getAllUsers();
@@ -16,7 +20,8 @@ export class UsersController {
 
   // @Desc Get User By Id
   // @Route Get /users/:id
-  //@access Public
+  //@access [Admin, manager] 
+  @Roles(['admin', 'manager'])
   @Get(':id')
   getUserById(@Param("id") id: string) {
     return this.usersService.getUserById(id);
@@ -24,7 +29,8 @@ export class UsersController {
 
   // @Desc Create New User 
   // @Route Post /users
-  //@access Public
+  //@access [Admin] 
+  @Roles(['admin'])
   @Post()
   createUser(@Body(new ValidationPipe({whitelist: true, forbidNonWhitelisted: true}))
    body: CreateUserDto) {
@@ -33,7 +39,8 @@ export class UsersController {
 
     // @Desc Update User 
     // @Route Patch /users/:id
-    //@access Public
+    //@access [Admin, manager] 
+    @Roles(['admin', 'manager'])
     @Patch(`:id`)
     updateUser(@Param('id') id: string, 
     @Body(new ValidationPipe({whitelist: true, forbidNonWhitelisted: true}))
@@ -43,7 +50,8 @@ export class UsersController {
 
     // @Desc Delete User 
     // @Route Delete /users/:id
-    //@access public
+    //@access private [Admin] 
+    @Roles(['admin'])
     @Delete(":id")
     deleteUser(@Param('id') id: string){
       return this.usersService.deleteUser(id);
