@@ -1,8 +1,8 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Users } from '../interfaces/users.interface';
-import { CreateUserDto } from '../Dtos/createUser.dto';
-import { UpdateUserDto } from '../Dtos/updateUser.dto';
+import { Users } from '../../interfaces/users.interface';
+import { CreateUserDto } from '../../Dtos/Admins/createUser.dto';
+import { UpdateUserDto } from '../../Dtos/Admins/updateUser.dto';
 @Injectable()
 export class UsersService {
     constructor(
@@ -15,7 +15,7 @@ export class UsersService {
         status: number;
         }> {
         const users = await this.usersModel.find()
-        .select('firstName lastName email');
+        .select('firstName lastName email role');
         return {data: users, count: users.length, status: 200};
       }
 
@@ -24,7 +24,7 @@ export class UsersService {
       status: number;
       }> {
         const user = await this.usersModel.findById(id)
-        .select('firstName lastName email');
+        .select('firstName lastName email role ');
         if (!user) {
           throw new HttpException('User not found', 404);
         }
@@ -51,4 +51,4 @@ export class UsersService {
         };
       return  'User deleted successfully';
       }
-    }
+}
